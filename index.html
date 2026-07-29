@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Test Turismo">
+<meta name="theme-color" content="#1B2A4A">
+<title>Test Esame — Corso Operatore Turistico</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#1B2A4A; --navy2:#253560; --gold:#C9953A; --gold2:#E8B96A;
+  --cream:#F7F4EE; --cream2:#EDE8DE; --white:#fff;
+  --text:#1B2A4A; --muted:#6B7A99; --border:#D8D2C4;
+  --ok:#2D7D52; --ok-bg:#EAF5EE; --ko:#B83232; --ko-bg:#FAEAEA;
+  --r:10px; --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;
+  background:var(--cream);color:var(--text);font-size:16px;line-height:1.55;
+  padding-bottom:calc(80px + var(--safe-bottom));
+}
+
+/* ── STICKY HEADER ── */
+.hdr{
+  position:sticky;top:0;z-index:200;
+  background:var(--navy);
+  padding:0 16px;
+  padding-top:env(safe-area-inset-top,0px);
+  box-shadow:0 2px 12px rgba(0,0,0,.3);
+}
+.hdr-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  height:54px;gap:8px;
+}
+.hdr-logo{
+  font-size:15px;font-weight:600;color:#fff;
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+}
+.hdr-logo-icon{
+  width:28px;height:28px;background:var(--gold);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
+}
+.hdr-stats{display:flex;gap:16px}
+.hstat{text-align:center}
+.hstat-v{font-size:18px;font-weight:700;color:var(--gold2);line-height:1}
+.hstat-l{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+
+/* ── HERO ── */
+.hero{
+  background:var(--navy);
+  padding:28px 20px 24px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0,rgba(255,255,255,.02) 1px,transparent 1px,transparent 20px);
+}
+.hero-eyebrow{
+  font-size:11px;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--gold2);margin-bottom:8px;font-weight:600;position:relative;
+}
+.hero h1{
+  font-size:clamp(22px,5vw,32px);font-weight:700;color:#fff;
+  line-height:1.2;margin-bottom:8px;position:relative;
+}
+.hero h1 em{font-style:normal;color:var(--gold2)}
+.hero-sub{font-size:14px;color:rgba(255,255,255,.6);margin-bottom:20px;position:relative}
+.prog-wrap{max-width:500px;margin:0 auto;position:relative}
+.prog-meta{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.5);margin-bottom:5px}
+.prog-track{height:5px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .4s ease}
+
+/* ── KPI STRIP ── */
+.kpi-strip{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:10px 16px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:0;
+}
+.kpi{text-align:center;padding:4px 6px;border-right:1px solid var(--border)}
+.kpi:last-child{border-right:none}
+.kpi-v{font-size:20px;font-weight:700;color:var(--navy);line-height:1}
+.kpi-v.g{color:var(--ok)}
+.kpi-v.r{color:var(--ko)}
+.kpi-v.au{color:var(--gold)}
+.kpi-l{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+
+/* ── BODY LAYOUT ── */
+.body{max-width:700px;margin:0 auto;padding:16px 14px 0}
+
+/* ── RESULT BOX ── */
+.result-box{
+  background:var(--white);border:2px solid var(--border);
+  border-radius:14px;padding:24px 20px;text-align:center;
+  display:none;margin-bottom:16px;
+}
+.result-box.show{display:block}
+.res-score{
+  font-size:56px;font-weight:700;color:var(--navy);line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.res-denom{font-size:14px;color:var(--muted);margin-bottom:10px}
+.res-grade{
+  font-size:15px;font-weight:600;
+  padding:8px 16px;border-radius:8px;
+  display:inline-block;margin-bottom:14px;
+}
+.res-grade.pass{background:var(--ok-bg);color:var(--ok)}
+.res-grade.fail{background:var(--ko-bg);color:var(--ko)}
+.btn-reset{
+  width:100%;height:46px;background:var(--navy);color:#fff;
+  border:none;border-radius:var(--r);font-size:15px;font-weight:600;
+  cursor:pointer;-webkit-appearance:none;
+}
+.btn-reset:active{opacity:.85}
+
+/* ── MODULE LABEL ── */
+.mod-label{
+  display:flex;align-items:center;gap:10px;
+  margin:20px 0 10px;
+}
+.mod-label:first-child{margin-top:0}
+.mod-tag{
+  font-size:10px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;color:#fff;background:var(--navy);
+  padding:4px 10px;border-radius:4px;white-space:nowrap;
+}
+.mod-line{flex:1;height:1px;background:var(--border)}
+
+/* ── QUESTION CARD ── */
+.qcard{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 14px 12px;
+  margin-bottom:10px;
+  transition:border-color .2s;
+  -webkit-overflow-scrolling:touch;
+}
+.qcard.ok{border-color:var(--ok);background:var(--ok-bg)}
+.qcard.ko{border-color:var(--ko);background:var(--ko-bg)}
+
+.q-top{display:flex;align-items:flex-start;gap:10px}
+.q-num{
+  min-width:26px;height:26px;border-radius:50%;
+  background:var(--cream);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:1px;
+}
+.qcard.ok .q-num{background:var(--ok);border-color:var(--ok);color:#fff}
+.qcard.ko .q-num{background:var(--ko);border-color:var(--ko);color:#fff}
+.q-text{font-size:14.5px;color:var(--text);line-height:1.5;flex:1}
+
+/* VF BUTTONS */
+.vf-row{display:flex;gap:8px;margin-top:12px;padding-left:36px}
+.vf-btn{
+  flex:1;height:42px;border-radius:8px;
+  border:1px solid var(--border);background:var(--cream2);
+  font-size:14px;font-weight:700;cursor:pointer;
+  -webkit-appearance:none;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  color:var(--text);transition:background .12s,border-color .12s;
+  /* touch-friendly */
+  min-height:44px;
+}
+.vf-btn:active:not(:disabled){transform:scale(.97)}
+.vf-btn:disabled{cursor:default;opacity:.85}
+.vf-btn.sel-v{background:var(--ok);border-color:var(--ok);color:#fff}
+.vf-btn.sel-f{background:var(--ko);border-color:var(--ko);color:#fff}
+.vf-btn.sel-v.wrong,.vf-btn.sel-f.wrong{background:var(--ko-bg);border-color:var(--ko);color:var(--ko)}
+
+/* FEEDBACK */
+.fb{
+  margin-top:8px;padding:8px 10px;border-radius:7px;
+  font-size:13px;line-height:1.45;display:none;
+}
+.fb.show{display:block}
+.fb.ok{background:rgba(45,125,82,.1);color:#1a5934;border-left:3px solid var(--ok)}
+.fb.ko{background:rgba(184,50,50,.08);color:#7a1c1c;border-left:3px solid var(--ko)}
+
+/* ── FLOATING PROGRESS BAR (BOTTOM) ── */
+.float-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:300;
+  background:rgba(27,42,74,.97);
+  backdrop-filter:saturate(180%) blur(12px);
+  -webkit-backdrop-filter:saturate(180%) blur(12px);
+  padding:10px 16px;
+  padding-bottom:calc(10px + var(--safe-bottom));
+  box-shadow:0 -2px 16px rgba(0,0,0,.25);
+}
+.float-bar-inner{
+  max-width:700px;margin:0 auto;
+  display:flex;align-items:center;gap:12px;
+}
+.float-bar-track{
+  flex:1;height:6px;background:rgba(255,255,255,.15);
+  border-radius:3px;overflow:hidden;
+}
+.float-bar-fill{
+  height:100%;background:var(--gold);border-radius:3px;
+  transition:width .4s ease;
+}
+.float-bar-txt{
+  font-size:12px;color:rgba(255,255,255,.6);white-space:nowrap;font-weight:500;
+}
+
+/* ── TIMER ── */
+.timer-wrap{
+  display:flex;align-items:center;gap:8px;
+  flex-shrink:0;
+}
+.timer-ring{position:relative;width:38px;height:38px;flex-shrink:0}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:3;stroke-linecap:round}
+.ring-bg{stroke:rgba(255,255,255,.15)}
+.ring-fill{stroke:var(--gold);transition:stroke-dashoffset .9s linear,stroke .4s}
+.ring-fill.warn{stroke:#F59E0B}
+.ring-fill.danger{stroke:var(--ko)}
+.timer-digits{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:700;color:#fff;letter-spacing:-.3px;
+}
+.timer-label{
+  font-size:11px;color:rgba(255,255,255,.55);line-height:1.3;
+}
+.timer-label span{display:block;font-size:14px;font-weight:700;color:#fff;letter-spacing:.2px}
+.timer-label.warn span{color:#FCD34D}
+.timer-label.danger span{color:#FCA5A5}
+
+/* start overlay */
+.start-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(27,42,74,.96);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+.start-card{
+  background:#fff;border-radius:20px;
+  padding:32px 28px;max-width:360px;width:100%;text-align:center;
+}
+.start-icon{font-size:48px;margin-bottom:12px}
+.start-card h2{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.start-card p{font-size:14px;color:var(--muted);line-height:1.55;margin-bottom:24px}
+.start-rules{
+  background:var(--cream);border-radius:10px;
+  padding:14px 16px;margin-bottom:22px;text-align:left;
+}
+.start-rules li{
+  font-size:13px;color:var(--text);
+  padding:4px 0;border-bottom:1px solid var(--border);
+  list-style:none;display:flex;align-items:center;gap:8px;
+}
+.start-rules li:last-child{border-bottom:none}
+.start-rules li::before{content:'';font-size:14px}
+.btn-start{
+  width:100%;height:50px;background:var(--navy);color:#fff;
+  border:none;border-radius:12px;font-size:16px;font-weight:700;
+  cursor:pointer;-webkit-appearance:none;letter-spacing:.3px;
+}
+.btn-start:active{opacity:.85}
+
+/* time-up overlay */
+.timeup-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(184,50,50,.95);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+.timeup-overlay.show{display:flex}
+.timeup-card{
+  background:#fff;border-radius:20px;
+  padding:32px 28px;max-width:360px;width:100%;text-align:center;
+}
+.timeup-icon{font-size:52px;margin-bottom:12px}
+.timeup-card h2{font-size:22px;font-weight:700;color:var(--ko);margin-bottom:8px}
+.timeup-card p{font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.timeup-score{font-size:42px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.timeup-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.btn-retry{
+  width:100%;height:46px;background:var(--navy);color:#fff;
+  border:none;border-radius:10px;font-size:15px;font-weight:600;
+  cursor:pointer;-webkit-appearance:none;
+}
+.btn-retry:active{opacity:.85}
+</style>
+</head>
+<body>
+
+<!-- START OVERLAY -->
+<div class="start-overlay" id="start-overlay">
+  <div class="start-card">
+    <div class="start-icon">✈</div>
+    <h2>Test di Esame</h2>
+    <p>Corso Operatore Turistico per Agenzia Viaggi — Prova finale con simulazione del tempo d'esame.</p>
+    <ul class="start-rules">
+      <li>⏱ Durata: <strong>60 minuti</strong></li>
+      <li>❓ 100 domande Vero / Falso</li>
+      <li>📚 12 moduli del corso</li>
+      <li>✅ Feedback immediato per ogni risposta</li>
+      <li>⚠️ Allo scadere del tempo il test si chiude</li>
+    </ul>
+    <button class="btn-start" onclick="startExam()">▶ Inizia l'esame</button>
+  </div>
+</div>
+
+<!-- TIME-UP OVERLAY -->
+<div class="timeup-overlay" id="timeup-overlay">
+  <div class="timeup-card">
+    <div class="timeup-icon">⏰</div>
+    <h2>Tempo scaduto!</h2>
+    <p>Il tempo a disposizione è terminato. Ecco il tuo risultato con le risposte date.</p>
+    <div class="timeup-score" id="tu-score">—</div>
+    <div class="timeup-sub" id="tu-sub">— su 100 risposte date</div>
+    <button class="btn-retry" onclick="resetTest()">↺ Riprova</button>
+  </div>
+</div>
+
+<!-- STICKY HEADER -->
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-logo">
+      <div class="hdr-logo-icon">✈</div>
+      Test Turismo
+    </div>
+    <div class="hdr-stats">
+      <div class="hstat"><div class="hstat-v" id="h-cor">0</div><div class="hstat-l">Corrette</div></div>
+      <div class="hstat"><div class="hstat-v" id="h-pct">—</div><div class="hstat-l">Score</div></div>
+      <div class="hstat"><div class="hstat-v" id="h-time" style="color:var(--gold2);letter-spacing:.5px">60:00</div><div class="hstat-l">Tempo</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Esame finale</div>
+  <h1>Test <em>Vero o Falso</em></h1>
+  <p class="hero-sub">100 domande · 12 moduli · Risposta immediata con spiegazione</p>
+  <div class="prog-wrap">
+    <div class="prog-meta">
+      <span id="prog-txt">0 di 100 risposte</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+</section>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi"><div class="kpi-v" id="k-ans">0</div><div class="kpi-l">Risposte</div></div>
+  <div class="kpi"><div class="kpi-v g" id="k-cor">0</div><div class="kpi-l">Corrette</div></div>
+  <div class="kpi"><div class="kpi-v r" id="k-err">0</div><div class="kpi-l">Errate</div></div>
+  <div class="kpi"><div class="kpi-v" id="k-rem">100</div><div class="kpi-l">Rimanenti</div></div>
+  <div class="kpi"><div class="kpi-v au" id="k-pct">—</div><div class="kpi-l">Score</div></div>
+</div>
+
+<!-- MAIN BODY -->
+<div class="body">
+  <div class="result-box" id="result-box">
+    <div class="res-score" id="res-score">—</div>
+    <div class="res-denom">risposte corrette su 100</div>
+    <div class="res-grade" id="res-grade">—</div>
+    <button class="btn-reset" onclick="resetTest()">↺ Ricomincia il test</button>
+  </div>
+  <div id="qarea"></div>
+</div>
+
+<!-- FLOATING BOTTOM BAR -->
+<div class="float-bar">
+  <div class="float-bar-inner">
+    <!-- Timer ring -->
+    <div class="timer-wrap">
+      <div class="timer-ring">
+        <svg width="38" height="38" viewBox="0 0 38 38">
+          <circle class="ring-bg" cx="19" cy="19" r="16" stroke-dasharray="100.5" stroke-dashoffset="0"/>
+          <circle class="ring-fill" id="ring-fill" cx="19" cy="19" r="16"
+            stroke-dasharray="100.5" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-digits" id="ring-digits">60</div>
+      </div>
+      <div class="timer-label" id="timer-label">
+        <span id="timer-display">60:00</span>
+        rimasti
+      </div>
+    </div>
+    <!-- Progress -->
+    <div class="float-bar-track"><div class="float-bar-fill" id="fbar" style="width:0%"></div></div>
+    <div class="float-bar-txt" id="fbar-txt">0 / 100</div>
+  </div>
+</div>
+
+<script>
+const Q=[
+/* ─── MODULO 1 — EVOLUZIONE STORICA (1-12) ─── */
+{m:"Modulo 1",t:"Il termine 'turismo' deriva dal verbo inglese 'to tour', che significa viaggiare.",a:true,fb:"Corretto. Il termine turismo deriva esattamente dal verbo inglese to tour."},
+{m:"Modulo 1",t:"Gli escursionisti sono coloro che pernottano fuori dalla propria residenza per almeno una notte.",a:false,fb:"Falso. Gli escursionisti si spostano in giornata senza pernottamento. Chi pernotta è il turista."},
+{m:"Modulo 1",t:"Il 'turismo incoming' indica il movimento di viaggiatori che arrivano all'interno della propria nazione.",a:true,fb:"Corretto. Incoming indica i flussi in entrata, cioè i turisti che si muovono all'interno del Paese o vi arrivano dall'estero."},
+{m:"Modulo 1",t:"Il Grand Tour aveva una durata di circa 3-4 anni e prevedeva tappe nelle principali città europee.",a:true,fb:"Corretto. Il Grand Tour era un viaggio formativo pluriennale riservato ai giovani aristocratici europei."},
+{m:"Modulo 1",t:"Thomas Cook fondò la prima agenzia di viaggio a Londra nel 1841.",a:false,fb:"Falso. Cook fondò l'agenzia a Leicester nel 1841; si trasferì a Londra solo nel 1852."},
+{m:"Modulo 1",t:"Le Mansiones romane erano stazioni di sosta distanti circa 30-40 km l'una dall'altra, riservate ai patrizi.",a:true,fb:"Corretto. Le Mansiones erano paragonabili agli attuali motel e servivano principalmente patrizi e funzionari imperiali."},
+{m:"Modulo 1",t:"Le Mutationes romane erano strutture che, come le Mansiones, offrivano anche alloggio ai viaggiatori.",a:false,fb:"Falso. Le Mutationes, distanti circa 5 km, erano paragonabili agli attuali autogrill: permettevano il cambio dei cavalli ma non fornivano alloggio."},
+{m:"Modulo 1",t:"Nell'epoca medievale il principale motivo di spostamento era quello religioso, con i pellegrini ospitati in chiese e monasteri.",a:true,fb:"Corretto. Nel Medioevo il pellegrinaggio era la forma di turismo più diffusa e l'ospitalità era offerta da strutture religiose."},
+{m:"Modulo 1",t:"La Rivoluzione Industriale nacque in Francia verso la fine del XVIII secolo.",a:false,fb:"Falso. La Rivoluzione Industriale nacque in Inghilterra a partire dal 1750 circa."},
+{m:"Modulo 1",t:"Il turismo montano è caratterizzato dalla bistagionalità, con flussi sia in estate che in inverno.",a:true,fb:"Corretto. Il turismo montano è sfruttato sia in estate (escursionismo) sia in inverno (sci), a differenza del balneare che è stagionale."},
+{m:"Modulo 1",t:"Il turismo balneare è la tipologia di turismo predominante in Italia, con picchi in luglio e agosto.",a:true,fb:"Corretto. Il turismo balneare è il più diffuso in Italia, con la massima concentrazione nei mesi estivi."},
+{m:"Modulo 1",t:"L'ENIT fu creato per promuovere il turismo italiano all'estero e garantire migliori standard all'industria alberghiera nazionale.",a:true,fb:"Corretto. L'ENIT (Ente Nazionale Italiano per il Turismo) aveva esattamente questi obiettivi istituzionali."},
+
+/* ─── MODULO 2 — GEOGRAFIA TURISTICA (13-22) ─── */
+{m:"Modulo 2",t:"L'Italia ha circa 7.500 km di coste e 1.800 km di confini terrestri.",a:true,fb:"Corretto. Questi sono i dati geografici ufficiali che descrivono la natura prevalentemente marittima dell'Italia."},
+{m:"Modulo 2",t:"Il Monte Bianco si trova nelle Alpi italiane con un'altezza di 4.810 m e rappresenta la vetta più alta delle Alpi.",a:true,fb:"Corretto. Il Monte Bianco è la cima più alta delle Alpi con i suoi 4.810 m."},
+{m:"Modulo 2",t:"La regione padana ha un clima mediterraneo con inverni miti e siccità estiva.",a:false,fb:"Falso. La Pianura Padana ha un clima continentale: inverni rigidi, spesso nebbiosi, ed estati calde e afose."},
+{m:"Modulo 2",t:"Le Cinque Terre in Liguria sono patrimonio UNESCO.",a:true,fb:"Corretto. Le Cinque Terre sono iscritte nella lista del Patrimonio Mondiale dell'Umanità UNESCO."},
+{m:"Modulo 2",t:"Venezia è la principale destinazione turistica del Veneto, seguita da Verona e dalle spiagge di Jesolo.",a:true,fb:"Corretto. Venezia primeggia nella regione, con Verona e le spiagge adriatiche a completare l'offerta turistica veneta."},
+{m:"Modulo 2",t:"Matera, con i suoi Sassi, è patrimonio UNESCO ed è stata Capitale Europea della Cultura nel 2019.",a:true,fb:"Corretto. Matera è stata Capitale Europea della Cultura nel 2019 e i suoi Sassi sono patrimonio UNESCO."},
+{m:"Modulo 2",t:"La Francia è la seconda destinazione turistica mondiale per numero di arrivi internazionali.",a:false,fb:"Falso. La Francia è tradizionalmente la prima destinazione turistica mondiale."},
+{m:"Modulo 2",t:"Su Nuraxi di Barumini, in Sardegna, è un sito nuragico patrimonio UNESCO.",a:true,fb:"Corretto. Su Nuraxi è il sito nuragico più importante dell'isola ed è patrimonio UNESCO."},
+{m:"Modulo 2",t:"La Costa Smeralda è una delle mete balneari esclusive della Sardegna.",a:true,fb:"Corretto. La Costa Smeralda è tra le destinazioni balneari di lusso più rinomate del Mediterraneo."},
+{m:"Modulo 2",t:"La regione alpina italiana ha inverni lunghi e nevosi ed estati brevi e fresche.",a:true,fb:"Corretto. Il clima alpino è caratterizzato da inverni rigidi e nevosi e da estati fresche e brevi."},
+
+/* ─── MODULO 3 — COMUNICAZIONE (23-36) ─── */
+{m:"Modulo 3",t:"Comunicare significa trasmettere, trasferire e mettere in comune con gli altri qualcosa che è nostro.",a:true,fb:"Corretto. Questa è la definizione fondamentale di comunicazione: un atto di condivisione di pensieri, opinioni ed emozioni."},
+{m:"Modulo 3",t:"Nella comunicazione, la componente verbale (le parole) è responsabile di circa l'85% del messaggio percepito.",a:false,fb:"Falso. È la componente paraverbale (tono, volume, ritmo) a pesare per circa l'85%. Le parole da sole contano solo il 15%."},
+{m:"Modulo 3",t:"Le interferenze nella comunicazione possono essere di tipo tecnico, sociale e psicologico.",a:true,fb:"Corretto. Questi sono i tre tipi di interferenze che possono disturbare la comunicazione tra emittente e ricevente."},
+{m:"Modulo 3",t:"La comunicazione monodirezionale è più veloce e diretta rispetto a quella bidirezionale.",a:true,fb:"Corretto. La comunicazione monodirezionale non richiede feedback ed è quindi più rapida, diretta e efficiente."},
+{m:"Modulo 3",t:"La comunicazione bidirezionale non prevede un feedback dal destinatario.",a:false,fb:"Falso. La comunicazione bidirezionale si basa proprio sul feedback: l'emittente si aspetta una risposta dal destinatario."},
+{m:"Modulo 3",t:"La PNL (Programmazione Neuro-Linguistica) si basa sul principio che 'la mappa non è il territorio'.",a:true,fb:"Corretto. Questo principio della PNL afferma che ognuno percepisce la realtà attraverso la propria mappa soggettiva."},
+{m:"Modulo 3",t:"L'ascolto con filtro è il livello più efficace di ascolto.",a:false,fb:"Falso. L'ascolto con filtro è uno dei livelli più bassi: si sente solo ciò che ci si aspetta. L'ascolto attivo è il livello più efficace."},
+{m:"Modulo 3",t:"L'ascolto attivo permette di capire i reali bisogni dell'interlocutore, liberi da pregiudizi.",a:true,fb:"Corretto. L'ascolto attivo è il livello massimo: piena attenzione all'interlocutore, senza filtri né pregiudizi."},
+{m:"Modulo 3",t:"La riformulazione consiste nel riproporre il contenuto detto dall'interlocutore con lo stesso tono e ritmo.",a:false,fb:"Falso. La riformulazione ripropone il contenuto; è invece il ricalco a riprodurre tono, volume e ritmo dell'interlocutore."},
+{m:"Modulo 3",t:"L'approccio WIN-WIN al conflitto è quello più produttivo perché tutti i soggetti ne traggono beneficio.",a:true,fb:"Corretto. Il WIN-WIN vede il conflitto come un'opportunità di crescita reciproca, ed è l'approccio più costruttivo."},
+{m:"Modulo 3",t:"Il modello SPACE per la gestione del conflitto sta per: Self, Purpose, Audience, Code, Experience.",a:true,fb:"Corretto. SPACE è un acronimo che descrive i 5 elementi di analisi strutturata del conflitto."},
+{m:"Modulo 3",t:"La comunicazione assertiva si pone tra l'aggressività e la passività.",a:true,fb:"Corretto. L'assertività è l'equilibrio tra l'imporre il proprio punto di vista (aggressività) e il rinunciare ad esprimerlo (passività)."},
+{m:"Modulo 3",t:"Al telefono si consiglia di non superare le 110 parole al minuto per mantenere la chiarezza.",a:true,fb:"Corretto. Superare le 110 parole al minuto al telefono rende il messaggio difficile da seguire per l'interlocutore."},
+{m:"Modulo 3",t:"Sorridere mentre si parla al telefono migliora la vocalizzazione e si percepisce dall'interlocutore.",a:true,fb:"Corretto. Il sorriso modifica la forma della bocca e l'apertura della gola, migliorando effettivamente la qualità vocale."},
+
+/* ─── MODULO 4 — TECNICA AMMINISTRATIVA (37-46) ─── */
+{m:"Modulo 4",t:"L'articolo 16 della Costituzione italiana garantisce la libertà di movimento dei cittadini.",a:true,fb:"Corretto. L'art. 16 Cost. tutela la libertà di circolazione, limitabile solo per motivi di sanità o sicurezza."},
+{m:"Modulo 4",t:"Il passaporto contiene dati biometrici ed è richiesto per la maggior parte dei Paesi extra-UE.",a:true,fb:"Corretto. Il passaporto biometrico è il principale documento per l'espatrio verso Paesi al di fuori dell'Unione Europea."},
+{m:"Modulo 4",t:"Gli accordi di Schengen eliminano i controlli alle frontiere interne ma rafforzano quelli alle frontiere esterne.",a:true,fb:"Corretto. Schengen abbatte le frontiere interne tra i Paesi aderenti e potenzia i controlli alle frontiere esterne dell'area."},
+{m:"Modulo 4",t:"Nell'area UE è possibile trasportare liberamente qualsiasi quantità di denaro contante.",a:false,fb:"Falso. Nell'area UE importi superiori a 10.000€ devono essere dichiarati alle Dogane."},
+{m:"Modulo 4",t:"Il voucher turistico è un mezzo di pagamento alternativo al contante o alla carta di credito.",a:false,fb:"Falso. Il voucher non è un mezzo di pagamento. Il pagamento è già avvenuto alla sua emissione; è solo un buono di accesso al servizio."},
+{m:"Modulo 4",t:"L'assicurazione di annullamento copre le spese in caso di cancellazione del viaggio per motivi documentabili.",a:true,fb:"Corretto. Protegge da perdite economiche dovute a cancellazione per malattia, lutto o emergenze lavorative documentabili."},
+{m:"Modulo 4",t:"Il tasso di cambio 'certo per incerto' esprime quante unità di valuta straniera si ottengono per 1 unità di valuta domestica.",a:true,fb:"Corretto. Esempio: 1€ = 1,20$ significa che con 1 euro si ottengono 1,20 dollari."},
+{m:"Modulo 4",t:"I travellers' cheques non possono essere rimborsati in caso di smarrimento o furto.",a:false,fb:"Falso. Il principale vantaggio dei travellers' cheques è proprio la possibilità di essere rimborsati in caso di furto o smarrimento."},
+{m:"Modulo 4",t:"Il pricing dinamico prevede che i prezzi varino in tempo reale in base a domanda e disponibilità.",a:true,fb:"Corretto. Il pricing dinamico (o revenue management) aggiorna i prezzi continuamente in funzione della domanda e delle disponibilità."},
+{m:"Modulo 4",t:"La patente internazionale è necessaria per guidare in alcuni Paesi extra-UE ed è rilasciata dall'ACI.",a:true,fb:"Corretto. La patente internazionale viene rilasciata dall'Automobile Club d'Italia ed è necessaria in alcuni Paesi fuori dall'UE."},
+
+/* ─── MODULO 5 — ECONOMIA AZIENDALE (47-59) ─── */
+{m:"Modulo 5",t:"L'articolo 2555 del Codice Civile definisce l'azienda come il complesso di beni organizzati dall'imprenditore per l'esercizio dell'impresa.",a:true,fb:"Corretto. Questa è la definizione giuridica precisa di azienda contenuta nel Codice Civile."},
+{m:"Modulo 5",t:"L'articolo 2082 del Codice Civile definisce l'imprenditore come chi esercita professionalmente un'attività economica organizzata.",a:true,fb:"Corretto. L'art. 2082 c.c. richiede i requisiti di professionalità e organizzazione per qualificarsi come imprenditore."},
+{m:"Modulo 5",t:"Nelle società di capitali i soci rispondono illimitatamente delle obbligazioni sociali con il loro patrimonio personale.",a:false,fb:"Falso. Nelle società di capitali la responsabilità è limitata alla quota conferita. La responsabilità illimitata riguarda le società di persone."},
+{m:"Modulo 5",t:"Il capitale minimo per costituire una SRL è di 10.000€.",a:true,fb:"Corretto. La SRL richiede un capitale sociale minimo di 10.000€; la SPA richiede almeno 120.000€."},
+{m:"Modulo 5",t:"I bisogni di autorealizzazione si trovano alla base della Piramide di Maslow.",a:false,fb:"Falso. I bisogni di autorealizzazione sono al vertice della piramide (livello più alto). Alla base ci sono i bisogni fisiologici primari."},
+{m:"Modulo 5",t:"Le società di persone non hanno personalità giuridica e si caratterizzano per la responsabilità illimitata e solidale dei soci.",a:true,fb:"Corretto. Le SNC, SAS e SS non hanno personalità giuridica propria e i soci rispondono personalmente dei debiti sociali."},
+{m:"Modulo 5",t:"La SNC (Società in Nome Collettivo) è la forma più comune di società di persone per l'esercizio di attività commerciale.",a:true,fb:"Corretto. La SNC è la più diffusa tra le società di persone per attività commerciali."},
+{m:"Modulo 5",t:"Nella SAS (Società in Accomandita Semplice), i soci accomandanti gestiscono l'azienda e hanno responsabilità illimitata.",a:false,fb:"Falso. Nella SAS sono gli accomandatari ad avere responsabilità illimitata e a gestire l'azienda. Gli accomandanti fungono da finanziatori con responsabilità limitata."},
+{m:"Modulo 5",t:"Il bilancio d'esercizio è composto da Stato Patrimoniale, Conto Economico e Nota Integrativa.",a:true,fb:"Corretto. Questi tre documenti sono obbligatori per legge (artt. 2424, 2425, 2427 c.c.) per le società di capitali."},
+{m:"Modulo 5",t:"Il principio di prudenza nel bilancio prevede che si iscrivano solo gli utili realizzati, mai quelli sperati.",a:true,fb:"Corretto. Secondo il principio di prudenza (art. 2423 bis c.c.) gli utili sperati ma non realizzati non devono figurare nel bilancio."},
+{m:"Modulo 5",t:"Il Conto Economico mostra la composizione del patrimonio aziendale in un determinato momento.",a:false,fb:"Falso. È lo Stato Patrimoniale a rappresentare la composizione del patrimonio. Il Conto Economico mostra invece la formazione del reddito (ricavi e costi)."},
+{m:"Modulo 5",t:"Le fasi della gestione aziendale in ordine logico sono: finanziamenti, investimenti, produzione, disinvestimenti.",a:true,fb:"Corretto. Questo è il ciclo classico della gestione aziendale: si raccolgono fondi, si acquistano fattori produttivi, si produce e infine si vende."},
+{m:"Modulo 5",t:"I debiti a breve termine hanno scadenza entro 12 mesi.",a:true,fb:"Corretto. Per convenzione contabile e giuridica, i debiti a breve termine scadono entro l'esercizio successivo (12 mesi)."},
+
+/* ─── MODULO 6 — ECONOMIA TURISTICA (60-67) ─── */
+{m:"Modulo 6",t:"Il turismo incoming è assimilabile alle esportazioni perché porta valuta estera nell'economia nazionale.",a:true,fb:"Corretto. I turisti stranieri che spendono in Italia portano denaro dall'estero, migliorando la bilancia dei pagamenti."},
+{m:"Modulo 6",t:"La stagionalità è un vantaggio per il settore turistico perché concentra le risorse in periodi ben definiti.",a:false,fb:"Falso. La stagionalità è uno dei principali problemi del turismo: provoca sovraccarichi nei periodi di punta e sotto-utilizzo delle strutture nel resto dell'anno."},
+{m:"Modulo 6",t:"L'offerta turistica comprende beni naturali e culturali, infrastrutture e servizi turistici.",a:true,fb:"Corretto. L'offerta turistica si articola in queste tre macro-componenti che insieme determinano la competitività di una destinazione."},
+{m:"Modulo 6",t:"Il turismo interno redistribuisce la ricchezza all'interno del Paese senza influenzare la bilancia dei pagamenti.",a:true,fb:"Corretto. Il turismo interno trasferisce risorse da un'area geografica all'altra ma non incide sugli scambi con l'estero."},
+{m:"Modulo 6",t:"L'Europa è il continente meno visitato al mondo con circa 100 milioni di turisti all'anno.",a:false,fb:"Falso. L'Europa è il continente più visitato al mondo, con circa 440 milioni di turisti internazionali all'anno (dati pre-pandemia)."},
+{m:"Modulo 6",t:"Il turismo genera spesso occupazione di carattere stagionale e precario, il che limita la sostenibilità del settore.",a:true,fb:"Corretto. La precarietà e la stagionalità del lavoro turistico sono sfide strutturali che richiedono politiche di miglioramento."},
+{m:"Modulo 6",t:"Un'eccessiva dipendenza dal turismo rende un'economia locale più resiliente alle crisi esterne.",a:false,fb:"Falso. È vero il contrario: un'economia mono-turistica è più vulnerabile a crisi esterne (pandemie, crisi internazionali, eventi climatici)."},
+{m:"Modulo 6",t:"L'intervento pubblico nel turismo è spesso necessario per bilanciare sviluppo economico e tutela del patrimonio.",a:true,fb:"Corretto. Senza regolamentazione pubblica, l'overtourism e la speculazione possono degradare le stesse risorse che attraggono i turisti."},
+
+/* ─── MODULO 7 — MARKETING (68-82) ─── */
+{m:"Modulo 7",t:"Il marketing transazionale è focalizzato esclusivamente sul prodotto e sulle vendite a breve termine.",a:true,fb:"Corretto. Il marketing transazionale ('make and sell') punta su prestazioni, prezzo e volume di vendita nel breve periodo."},
+{m:"Modulo 7",t:"Il marketing relazionale punta a costruire relazioni di qualità con il cliente nel lungo periodo.",a:true,fb:"Corretto. Il marketing relazionale ('sense and respond') si basa sulla cooperazione con il cliente e sulla fidelizzazione nel tempo."},
+{m:"Modulo 7",t:"Il CRM (Customer Relationship Management) serve principalmente a gestire le relazioni con i fornitori.",a:false,fb:"Falso. Il CRM è un sistema per gestire e migliorare le relazioni con i clienti, non con i fornitori."},
+{m:"Modulo 7",t:"L'analisi PEST considera fattori Politici, Economici, Sociali e Tecnologici dell'ambiente esterno.",a:true,fb:"Corretto. La PEST è un'analisi del macroambiente che valuta questi quattro tipi di fattori per comprendere il contesto in cui opera l'impresa."},
+{m:"Modulo 7",t:"La segmentazione divide il mercato in gruppi omogenei di consumatori con caratteristiche simili.",a:true,fb:"Corretto. Segmentare significa suddividere il mercato in cluster omogenei per applicare strategie di marketing mirate."},
+{m:"Modulo 7",t:"Il targeting consiste nel definire la proposta di valore nella mente del consumatore.",a:false,fb:"Falso. Il targeting è la scelta dei segmenti di mercato su cui competere. La proposta di valore nella mente del consumatore è invece il posizionamento."},
+{m:"Modulo 7",t:"Nella matrice SWOT, le Opportunities (Opportunità) sono fattori esterni favorevoli all'azienda.",a:true,fb:"Corretto. Nella SWOT, Strengths e Weaknesses sono fattori interni; Opportunities e Threats sono fattori esterni."},
+{m:"Modulo 7",t:"Il modello AIDA descrive le fasi del funnel: Awareness, Interest, Desire, Action.",a:true,fb:"Corretto. AIDA (Consapevolezza, Interesse, Desiderio, Azione) è il modello classico del processo d'acquisto del consumatore."},
+{m:"Modulo 7",t:"Un margine del 40% e un mark-up del 40% esprimono la stessa percentuale di profitto.",a:false,fb:"Falso. Il margine si calcola sul prezzo (40/100 = 40%), il mark-up si calcola sul costo (40/60 = 66,7%). Sono concetti diversi."},
+{m:"Modulo 7",t:"Il posizionamento riguarda la percezione del cliente, non solo il valore reale del prodotto.",a:true,fb:"Corretto. Il posizionamento è una questione di percezione: ciò che conta è come il cliente percepisce il prodotto rispetto ai competitor."},
+{m:"Modulo 7",t:"Il Diagramma di Abell per la macro-segmentazione si basa su tre assi: clienti, bisogni e tecnologie.",a:true,fb:"Corretto. Il Diagramma di Abell incrocia i tre assi (gruppi di clienti, funzioni d'uso, tecnologie) per definire le aree strategiche di business."},
+{m:"Modulo 7",t:"La sponsorizzazione sportiva permette a un'azienda di ottenere visibilità associando il marchio ad atleti o squadre.",a:true,fb:"Corretto. La sponsorizzazione sportiva è il settore che riceve i maggiori investimenti pubblicitari in Italia."},
+{m:"Modulo 7",t:"La Corporate Social Responsibility (CSR) è obbligatoria per legge per tutte le società di capitali.",a:false,fb:"Falso. La CSR è volontaria. Le aziende scelgono autonomamente di integrare considerazioni sociali e ambientali nelle proprie strategie."},
+{m:"Modulo 7",t:"La web sponsorship consiste nello sponsorizzare un sito web per creare un'associazione positiva tra marca e sito.",a:true,fb:"Corretto. La web sponsorship trasferisce al digitale le logiche della sponsorizzazione tradizionale, richiedendo coerenza tra immagine aziendale e sito sponsorizzato."},
+{m:"Modulo 7",t:"La segmentazione comportamentale analizza ruoli nel processo d'acquisto, benefici attesi e livello di fedeltà al brand.",a:true,fb:"Corretto. La segmentazione comportamentale esamina come il cliente si comporta rispetto al prodotto: chi decide, quando usa, quanto è fedele."},
+
+/* ─── MODULO 8 — MARKETING TURISTICO (83-89) ─── */
+{m:"Modulo 8",t:"Il ciclo di vita del prodotto alberghiero include le fasi: introduzione, crescita, maturità e declino.",a:true,fb:"Corretto. Come qualsiasi prodotto, anche la struttura ricettiva attraversa queste quattro fasi che richiedono strategie di marketing diverse."},
+{m:"Modulo 8",t:"Nella fase di declino di un prodotto alberghiero, le vendite e i profitti aumentano progressivamente.",a:false,fb:"Falso. Nel declino vendite e profitti calano. L'azienda deve scegliere tra ristrutturazione/riposizionamento o riduzione degli investimenti."},
+{m:"Modulo 8",t:"Le OLTA (Online Travel Agencies) come Booking.com e Expedia sono canali distributivi diretti.",a:false,fb:"Falso. Le OLTA sono canali distributivi indiretti: si interpongono tra struttura ricettiva e cliente finale applicando commissioni del 15-25%."},
+{m:"Modulo 8",t:"Il Revenue Management ha come obiettivo la vendita del prodotto giusto al cliente giusto, al momento e al prezzo giusti.",a:true,fb:"Corretto. Questo è esattamente il principio fondamentale del Revenue Management (o Yield Management)."},
+{m:"Modulo 8",t:"Il Tour Operator organizza e vende pacchetti turistici acquistando i componenti all'ingrosso e riassemblandoli.",a:true,fb:"Corretto. Il TO lavora in grandi volumi, aggregando voli, hotel e servizi in pacchetti da rivendere attraverso le agenzie."},
+{m:"Modulo 8",t:"I GDS (Global Distribution Systems) sono sistemi informatici usati esclusivamente dai clienti finali per prenotare viaggi.",a:false,fb:"Falso. I GDS (Amadeus, Sabre, Galileo) sono sistemi B2B usati principalmente dagli agenti di viaggio professionisti, non dai clienti finali."},
+{m:"Modulo 8",t:"Il mercato ricettivo si rivolge sia ai clienti individuali (leisure) sia ai clienti istituzionali (business e congressuale).",a:true,fb:"Corretto. Il mercato alberghiero si divide tra segmento leisure (vacanze e svago) e segmento business (lavoro, congressi, incentive)."},
+
+/* ─── MODULO 9 — DIRITTO INTERNAZIONALE E UE (90-93) ─── */
+{m:"Modulo 9",t:"Il Consiglio di Sicurezza dell'ONU è l'unico organo con potere di adottare risoluzioni vincolanti per tutti gli Stati.",a:true,fb:"Corretto. Il Consiglio di Sicurezza ha 15 membri (5 permanenti con diritto di veto) ed è l'unico organo ONU con potere vincolante."},
+{m:"Modulo 9",t:"I Regolamenti europei richiedono un recepimento nazionale prima di diventare applicabili nei singoli Stati membri.",a:false,fb:"Falso. I Regolamenti UE sono direttamente applicabili in tutti gli Stati membri senza necessità di recepimento, a differenza delle Direttive."},
+{m:"Modulo 9",t:"L'ONU è nata nel 1945 con sede principale a New York.",a:true,fb:"Corretto. Le Nazioni Unite furono fondate nel 1945 a San Francisco e la sede principale è a New York."},
+{m:"Modulo 9",t:"Il Trattato di Maastricht del 1992 segnò la nascita ufficiale dell'Unione Europea.",a:true,fb:"Corretto. Il Trattato di Maastricht istituì l'UE, introdusse la cittadinanza europea e gettò le basi per la moneta unica."},
+
+/* ─── MODULO 10 — DIRITTO CIVILE (94-96) ─── */
+{m:"Modulo 10",t:"Per la validità della maggior parte dei contratti la forma scritta è sempre obbligatoria.",a:false,fb:"Falso. La forma è generalmente libera. La forma scritta è obbligatoria solo per categorie specifiche come la compravendita di immobili."},
+{m:"Modulo 10",t:"L'usucapione consente di acquistare la proprietà di un bene attraverso il possesso prolungato e pacifico nel tempo.",a:true,fb:"Corretto. L'usucapione richiede 20 anni per gli immobili e 10 anni per i beni mobili registrati (possesso continuato, pacifico e pubblico)."},
+{m:"Modulo 10",t:"Il contratto ha come elementi essenziali: accordo delle parti, causa, oggetto e — quando richiesta dalla legge — la forma.",a:true,fb:"Corretto. Questi quattro elementi sono indispensabili per la validità del contratto secondo il Codice Civile italiano."},
+
+/* ─── MODULO 11 — LEGISLAZIONE TURISTICA (97-98) ─── */
+{m:"Modulo 11",t:"Con la Riforma Costituzionale del 2001 il turismo è diventato materia di legislazione esclusiva delle Regioni.",a:true,fb:"Corretto. La riforma del Titolo V della Costituzione ha trasferito la competenza esclusiva in materia di turismo alle Regioni."},
+{m:"Modulo 11",t:"Per esercitare la professione di guida turistica in Italia non è richiesta alcuna abilitazione.",a:false,fb:"Falso. Per esercitare come guida turistica è necessaria un'abilitazione attraverso esame regionale."},
+
+/* ─── MODULO 12 — ENGLISH FOR TOURISM (99-100) ─── */
+{m:"Modulo 12",t:"'Half Board' (HB) in hotel means room, breakfast and one main meal (lunch or dinner).",a:true,fb:"Correct. HB (Half Board / Mezza Pensione) includes room + breakfast + one main meal (either lunch or dinner)."},
+{m:"Modulo 12",t:"In formal English business correspondence, 'Yours faithfully' is used when you know the recipient's name.",a:false,fb:"False. 'Yours faithfully' is used when you do NOT know the recipient's name. 'Yours sincerely' is used when you DO know their name."},
+];
+
+const TOTAL=Q.length;
+const EXAM_SECONDS=3600; // 60 minutes
+let answers=new Array(TOTAL).fill(null),correct=0,answered=0;
+let timerInterval=null,secondsLeft=EXAM_SECONDS,examStarted=false;
+
+/* ── TIMER ── */
+const CIRC=100.53; // 2*pi*16
+
+function startExam(){
+  document.getElementById('start-overlay').style.display='none';
+  examStarted=true;
+  secondsLeft=EXAM_SECONDS;
+  updateTimer();
+  timerInterval=setInterval(()=>{
+    secondsLeft--;
+    updateTimer();
+    if(secondsLeft<=0){
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  },1000);
+}
+
+function updateTimer(){
+  const m=Math.floor(secondsLeft/60);
+  const s=secondsLeft%60;
+  const mmss=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  // header
+  const htime=document.getElementById('h-time');
+  htime.textContent=mmss;
+  // ring digits (show minutes only)
+  document.getElementById('ring-digits').textContent=m;
+  // ring fill (decreases)
+  const frac=secondsLeft/EXAM_SECONDS;
+  const offset=CIRC*(1-frac);
+  const ring=document.getElementById('ring-fill');
+  ring.style.strokeDashoffset=offset;
+  // timer display in bar
+  document.getElementById('timer-display').textContent=mmss;
+  // colour states
+  const lbl=document.getElementById('timer-label');
+  if(secondsLeft<=300){ // last 5 min
+    ring.className='ring-fill danger';
+    lbl.className='timer-label danger';
+    htime.style.color='#FCA5A5';
+  } else if(secondsLeft<=600){ // last 10 min
+    ring.className='ring-fill warn';
+    lbl.className='timer-label warn';
+    htime.style.color='#FCD34D';
+  } else {
+    ring.className='ring-fill';
+    lbl.className='timer-label';
+    htime.style.color='var(--gold2)';
+  }
+}
+
+function timeUp(){
+  // disable all remaining buttons
+  Q.forEach((_,i)=>{
+    if(answers[i]===null){
+      const vb=document.getElementById('v'+i);
+      const fb=document.getElementById('f'+i);
+      if(vb)vb.disabled=true;
+      if(fb)fb.disabled=true;
+    }
+  });
+  const pct=answered>0?Math.round(correct/answered*100):0;
+  document.getElementById('tu-score').textContent=correct+'/'+answered;
+  document.getElementById('tu-sub').textContent='risposte date su '+TOTAL+' — punteggio '+pct+'%';
+  document.getElementById('timeup-overlay').classList.add('show');
+}
+
+function buildUI(){
+  const mods=[...new Set(Q.map(q=>q.m))];
+  const area=document.getElementById('qarea');
+  area.innerHTML='';
+  mods.forEach(mod=>{
+    const lbl=document.createElement('div');
+    lbl.className='mod-label';
+    lbl.innerHTML=`<span class="mod-tag">${mod}</span><span class="mod-line"></span>`;
+    area.appendChild(lbl);
+    Q.forEach((q,i)=>{
+      if(q.m!==mod)return;
+      const card=document.createElement('div');
+      card.className='qcard';card.id='c'+i;
+      card.innerHTML=`
+        <div class="q-top">
+          <div class="q-num" id="qn${i}">${i+1}</div>
+          <div class="q-text">${q.t}</div>
+        </div>
+        <div class="vf-row">
+          <button class="vf-btn" id="v${i}" onclick="answer(${i},true)">✓ Vero</button>
+          <button class="vf-btn" id="f${i}" onclick="answer(${i},false)">✗ Falso</button>
+        </div>
+        <div class="fb" id="fb${i}"></div>`;
+      area.appendChild(card);
+    });
+  });
+}
+
+function answer(i,val){
+  if(answers[i]!==null)return;
+  answers[i]=val;answered++;
+  const ok=val===Q[i].a;
+  if(ok)correct++;
+  const card=document.getElementById('c'+i);
+  const vb=document.getElementById('v'+i);
+  const fb2=document.getElementById('f'+i);
+  const fb=document.getElementById('fb'+i);
+  card.classList.add(ok?'ok':'ko');
+  if(val){vb.classList.add('sel-v');if(!ok)vb.classList.add('wrong');}
+  else{fb2.classList.add('sel-f');if(!ok)fb2.classList.add('wrong');}
+  vb.disabled=true;fb2.disabled=true;
+  fb.textContent=(ok?'✓ ':'✗ ')+Q[i].fb;
+  fb.className='fb show '+(ok?'ok':'ko');
+  updateStats();
+  if(answered===TOTAL)showResult();
+}
+
+function updateStats(){
+  const pct=answered>0?Math.round(correct/answered*100):0;
+  const totPct=Math.round(answered/TOTAL*100);
+  document.getElementById('h-cor').textContent=correct;
+  document.getElementById('h-pct').textContent=answered>0?pct+'%':'—';
+  document.getElementById('k-ans').textContent=answered;
+  document.getElementById('k-cor').textContent=correct;
+  document.getElementById('k-err').textContent=answered-correct;
+  document.getElementById('k-rem').textContent=TOTAL-answered;
+  document.getElementById('k-pct').textContent=answered>0?pct+'%':'—';
+  document.getElementById('prog-txt').textContent=answered+' di '+TOTAL+' risposte';
+  document.getElementById('prog-pct').textContent=totPct+'%';
+  document.getElementById('prog-fill').style.width=totPct+'%';
+  document.getElementById('fbar').style.width=totPct+'%';
+  document.getElementById('fbar-txt').textContent=answered+' / '+TOTAL;
+}
+
+function showResult(){
+  // stop timer when all answered
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  const box=document.getElementById('result-box');
+  const pct=Math.round(correct/TOTAL*100);
+  const timeUsed=EXAM_SECONDS-secondsLeft;
+  const mu=Math.floor(timeUsed/60),su=timeUsed%60;
+  document.getElementById('res-score').textContent=correct+'/'+TOTAL;
+  const g=document.getElementById('res-grade');
+  const timeStr=' · Tempo: '+String(mu).padStart(2,'0')+':'+String(su).padStart(2,'0');
+  if(pct>=90){g.textContent='🏆 Ottimo! '+pct+'%'+timeStr;g.className='res-grade pass';}
+  else if(pct>=75){g.textContent='✅ Buono! '+pct+'%'+timeStr;g.className='res-grade pass';}
+  else if(pct>=60){g.textContent='📘 Sufficiente — '+pct+'%'+timeStr;g.className='res-grade pass';}
+  else{g.textContent='❌ Insufficiente — '+pct+'%'+timeStr;g.className='res-grade fail';}
+  box.classList.add('show');
+  setTimeout(()=>box.scrollIntoView({behavior:'smooth',block:'start'}),200);
+}
+
+function resetTest(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  answers=new Array(TOTAL).fill(null);correct=0;answered=0;
+  examStarted=false;secondsLeft=EXAM_SECONDS;
+  document.getElementById('result-box').classList.remove('show');
+  document.getElementById('timeup-overlay').classList.remove('show');
+  document.getElementById('h-time').textContent='60:00';
+  document.getElementById('h-time').style.color='var(--gold2)';
+  updateTimer();
+  updateStats();buildUI();
+  // show start overlay again
+  document.getElementById('start-overlay').style.display='flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+buildUI();updateStats();
+</script>
+</body>
+</html>
